@@ -116,28 +116,25 @@ class McDiceBceLoss(nn.Layer):
         return diceloss + bceloss
 
 
-def fccdn_loss_bcd(scores, labels):
+def fccdn_loss_ssl(scores, labels):
     """
-    FCCDN change detection task loss
+    FCCDN change detection self-supervised learning loss
     Args:
-        scores(list) = model(input) = [y, y1, y2]
+        scores(list) = model(input) = [y1, y2]
         labels(tensor-int64) = binary_cd_labels
     """
 
     # Create loss
     criterion_ssl = DiceBceLoss()
-    criterion_mask = seg_losses.CrossEntropyLoss()
 
     # Get downsampled change map
     labels_downsample = labels.unsqueeze(1).astype(paddle.float32)
     pool = paddle.nn.MaxPool2D(kernel_size=2, stride=(2, 2), padding=(0, 0))
     labels_downsample = pool(labels_downsample)
 
-    # Change loss
-    loss_change = criterion_mask(scores[0], labels)
     # Seg map
-    out1 = paddle.nn.functional.sigmoid(scores[1]).clone()
-    out2 = paddle.nn.functional.sigmoid(scores[2]).clone()
+    out1 = paddle.nn.functional.sigmoid(scores[0]).clone()
+    out2 = paddle.nn.functional.sigmoid(scores[1]).clone()
     out3 = out1.clone()
     out4 = out2.clone()
 
@@ -164,5 +161,4 @@ def fccdn_loss_bcd(scores, labels):
     loss_aux += 0.2 * criterion_ssl(out4, labels_downsample - pred_seg_pre_tmp2,
                                     False)
 
-    # Final loss
-    return loss_change + loss_aux
+    return loss_aux
