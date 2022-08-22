@@ -148,9 +148,9 @@ def fccdn_loss_ssl(scores, labels):
     pred_seg_post_tmp1 = paddle.ones(out2.shape)
     pred_seg_post_tmp1[out2 <= 0.5] = 0
 
-    pred_seg_pre_tmp2 = paddle.ones(scores[1].shape)
+    pred_seg_pre_tmp2 = paddle.ones(scores[0].shape)
     pred_seg_pre_tmp2[out3 <= 0.5] = 0
-    pred_seg_post_tmp2 = paddle.ones(scores[2].shape)
+    pred_seg_post_tmp2 = paddle.ones(scores[1].shape)
     pred_seg_post_tmp2[out4 <= 0.5] = 0
 
     # Seg loss
